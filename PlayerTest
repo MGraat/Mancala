@@ -1,0 +1,30 @@
+package nl.sogyo.mancala;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class PlayerTest {
+
+    @Test
+    public void playerCanBeCreatedTest() {
+        Player player = new Player();
+        Assert.assertNotNull(player);
+    }
+
+    @Test
+    public void testGetOpponent() {
+        Player player = new Player();
+        player.getOpponent();
+        Assert.assertNotNull(player.getOpponent());
+    }
+
+    @Test
+    public void testSwitchOwner() {
+        Player player = new Player();
+        player.switchOwner();
+        Assert.assertFalse(player.getTurn());
+        Assert.assertTrue(player.getOpponent().getTurn());
+    }
+}
