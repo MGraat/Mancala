@@ -1,0 +1,126 @@
+package nl.sogyo.mancala;
+
+public class Pocket extends SuperPocket {
+
+
+    protected Pocket() {
+        setOwner(new Player());
+        this.setNeighbour(new Pocket(this, 1, getOwner()));
+    }
+
+    protected Pocket(SuperPocket firstPocket, int count, Player player) {
+        count++;
+        this.setOwner(player);
+        if (count == 6 || count == 13) {
+            this.setNeighbour(new Kalaha(firstPocket, count, player));
+        } else if (count < 14) {
+            this.setNeighbour(new Pocket(firstPocket, count, player));
+        }
+    }
+
+    protected Player getPlayer() {
+        return owner;
+    }
+
+    protected boolean validMove() {
+        if (numbOfStones != 0 && this.getPlayer() == getPlayer() && getPlayer().getTurn()) {
+            makeAMove();
+        } else {
+            //pick another pocket
+        }
+        return false;
+    }
+
+    protected void makeAMove() {
+        if (numbOfStones > 0) {
+            int passStones = numbOfStones;
+            numbOfStones -= passStones;
+            neighbour.takeStones(passStones);
+            checkEndOfGame();
+        } else {
+            return;
+        }
+    }
+
+    protected void checkEndOfGame() {
+        Pocket neighbourOwnKalaha = (Pocket) findKalaha().neighbour;
+        if (neighbourOwnKalaha.checkPocketIsEmpty()) {
+            Pocket neighbourOtherKalaha = (Pocket) findKalaha().getStrikePocket().neighbour;
+            neighbourOtherKalaha.takeAllStonesAtEnd();
+            getWinner();
+        } else {
+            return;
+        }
+    }
+
+    protected void takeStones(int passStones) {
+        if (passStones > 1) {
+            numbOfStones++;
+            passStones--;
+            neighbour.takeStones(passStones);
+        } else {
+            if (numbOfStones == 0) {
+                takeStonesFromStrikePocket();
+            } else {
+                numbOfStones++;
+            }
+            owner.switchOwner();
+        }
+    }
+
+    protected boolean checkPocketIsEmpty() {
+        if (numbOfStones == 0) {
+            if (neighbour instanceof Kalaha) {
+                return true;
+            } else {
+                Pocket nextPocket = (Pocket) neighbour;
+                return nextPocket.checkPocketIsEmpty();
+            }
+        } else {
+            return false;
+        }
+    }
+
+    protected SuperPocket getStrikePocket() {
+        return findKalaha().goToPocket(getStepsToKalaha(0));
+    }
+
+    protected void takeStonesFromStrikePocket() {
+        if (getStrikePocket().numbOfStones > 0) {
+            int stonesFromStrike = getStrikePocket().numbOfStones;
+            getStrikePocket().numbOfStones -= stonesFromStrike;
+            int allStonesToKalaha = stonesFromStrike + 1;
+            Kalaha kalaha = (Kalaha) findKalaha();
+            kalaha.receiveStonesFromStrike(allStonesToKalaha);
+        } else {
+            numbOfStones++;
+        }
+    }
+
+    protected void takeAllStonesAtEnd() {
+        int allStonesToKalaha = numbOfStones;
+        numbOfStones -= allStonesToKalaha;
+        Kalaha kalaha = (Kalaha) findKalaha();
+        kalaha.receiveStonesFromStrike(allStonesToKalaha);
+        if (neighbour instanceof Kalaha) {
+            return;
+        } else {
+            Pocket nextPocket = (Pocket) neighbour;
+            nextPocket.takeAllStonesAtEnd();
+        }
+    }
+
+    protected void getWinner() {
+        if (findKalaha().numbOfStones > findKalaha().getStrikePocket().numbOfStones) {
+            owner.isWinner();
+        } else if (findKalaha().numbOfStones < findKalaha().getStrikePocket().numbOfStones) {
+            owner.getOpponent().isWinner();
+        } else {
+            owner.tie();
+        }
+    }
+
+}
+
+
+
