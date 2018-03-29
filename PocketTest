@@ -1,0 +1,184 @@
+package nl.sogyo.mancala;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class PocketTest {
+
+
+    @Test
+    public void thereIsAPocketTest() {
+        SuperPocket pocket = new Pocket();
+        Assert.assertNotNull(pocket);
+    }
+
+    @Test
+    public void pocketHasANeighbourTest() {
+        SuperPocket pocket = new Pocket();
+        Assert.assertNotNull(pocket.neighbour);
+    }
+
+    @Test
+    public void pocket1And2AreDifferentTest() {
+        Pocket pocket = new Pocket();
+        Assert.assertNotEquals(pocket, pocket.neighbour);
+    }
+
+    @Test
+    public void pocket1And2HaveSameOwnerTest() {
+        Pocket pocket = new Pocket();
+        Assert.assertEquals(pocket.owner, pocket.neighbour.owner);
+    }
+
+    @Test
+    public void kalaha1AndPocket8HaveDifferentOwnerTest() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(1);
+        Pocket located = (Pocket) pocket.findSuperPocketX(12);
+        Assert.assertNotSame(pocket1.getOwner(), located.getOwner());
+    }
+
+    @Test
+    public void eachPocketHas4StonesAtInitializationTest() {
+        Pocket pocket = new Pocket();
+        Assert.assertEquals(4, pocket.getNumbOfStones());
+
+    }
+
+    @Test
+    public void firstMoveTest() {
+        Pocket pocket = new Pocket();
+        pocket.validMove();
+
+        Assert.assertEquals(0, pocket.findSuperPocketX(1).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(2).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(3).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(4).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(5).getNumbOfStones());
+
+    }
+
+    @Test
+    public void testImpossibleMove() {
+        Pocket pocket = new Pocket();
+        pocket.setNumbOfStones(0);
+        pocket.validMove();
+        Assert.assertTrue(pocket.getPlayer().getTurn());
+        Assert.assertFalse(pocket.getPlayer().getOpponent().getTurn());
+        Assert.assertEquals(pocket.getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findKalaha().getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findSuperPocketX(4).getNumbOfStones(), 4);
+    }
+
+    @Test
+    public void testGetPlayer() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(9);
+        Assert.assertNotNull(pocket.getPlayer());
+        Assert.assertNotNull(pocket1.getPlayer());
+        Assert.assertNotSame(pocket.getPlayer(), pocket1.getPlayer());
+    }
+
+
+    @Test //Why you hate me test?
+    public void afterFirstMovePocket6AndKalahaHaveStayedTheSameTest() {
+        Pocket pocket = new Pocket();
+        pocket.validMove();
+
+        Assert.assertEquals(0, pocket.getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(2).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(3).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(4).getNumbOfStones());
+        Assert.assertEquals(5, pocket.findSuperPocketX(5).getNumbOfStones());
+        Assert.assertEquals(4, pocket.findSuperPocketX(6).getNumbOfStones());
+        Assert.assertEquals(0, pocket.findSuperPocketX(7).getNumbOfStones());
+        Assert.assertEquals(4, pocket.findSuperPocketX(8).getNumbOfStones());
+        Assert.assertEquals(4, pocket.findSuperPocketX(9).getNumbOfStones());
+
+    }
+
+    @Test
+    public void testFindStrikePocket() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(3);
+        Assert.assertNotNull(pocket1.getStrikePocket());
+        Assert.assertNotSame(pocket1.getStrikePocket(), pocket.findSuperPocketX(9));
+
+    }
+
+    @Test
+    public void testStrikePocketNotEmpty() {
+        Pocket pocket = new Pocket();
+        pocket.setNumbOfStones(0);
+        pocket.takeStonesFromStrikePocket();
+        Assert.assertEquals(pocket.getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.getStrikePocket().getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findKalaha().getNumbOfStones(), 5);
+    }
+
+    @Test
+    public void testStrikePocketIsEmpty() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(13);
+        pocket.setNumbOfStones(1);
+        pocket1.setNumbOfStones(0);
+        pocket.validMove();
+        pocket.takeStonesFromStrikePocket();
+        Assert.assertEquals(pocket.getNumbOfStones(), 1);
+        Assert.assertEquals(pocket1.getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findKalaha().getNumbOfStones(), 0);
+    }
+
+    @Test
+    public void testFinishMoveAtOwnKalaha() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(3);
+        pocket1.validMove();
+        Assert.assertTrue(pocket.getPlayer().getTurn());
+        Assert.assertFalse(pocket.getPlayer().getOpponent().getTurn());
+        Assert.assertEquals(pocket.findSuperPocketX(3).getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findSuperPocketX(4).getNumbOfStones(), 5);
+        Assert.assertEquals(pocket.findKalaha().getNumbOfStones(), 1);
+        Assert.assertEquals(pocket.findSuperPocketX(8).getNumbOfStones(), 4);
+    }
+
+    @Test
+    public void testTakeAllStonesAtTheEnd() {
+        Pocket pocket1 = new Pocket();
+        Pocket pocket8 = (Pocket) pocket1.findSuperPocketX(8);
+        for(int i=0; i<7; i++) {
+            pocket1.findSuperPocketX(i).setNumbOfStones(0);
+        }
+        pocket8.takeAllStonesAtEnd();
+        for(int i=0; i<7; i++){
+            Assert.assertEquals(pocket8.findSuperPocketX(i).getNumbOfStones(), 0);
+        }
+        Assert.assertEquals(pocket1.findKalaha().getNumbOfStones(), 0);
+        Assert.assertEquals(pocket8.findKalaha().getNumbOfStones(), 24);
+    }
+
+    @Test
+    public void testGetWinner() {
+        Pocket pocket = new Pocket();
+        Kalaha kalaha2 = (Kalaha) pocket.findSuperPocketX(14);
+        pocket.findKalaha().setNumbOfStones(13);
+        kalaha2.setNumbOfStones(15);
+        pocket.getWinner();
+        Assert.assertFalse(pocket.getPlayer().getWinner());
+        Assert.assertTrue(kalaha2.getPlayer().getWinner());
+    }
+
+    @Test
+    public void testTie() {
+        Pocket kalaha1 = new Pocket();
+        Kalaha kalaha2 = (Kalaha) kalaha1.findSuperPocketX(14);
+        kalaha1.findKalaha().setNumbOfStones(15);
+        kalaha2.setNumbOfStones(15);
+        kalaha1.getWinner();
+        Assert.assertFalse(kalaha1.getPlayer().getWinner());
+        Assert.assertFalse(kalaha2.getPlayer().getWinner() );
+    }
+
+}
