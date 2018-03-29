@@ -1,0 +1,43 @@
+package nl.sogyo.mancala;
+
+public class Kalaha extends SuperPocket {
+
+
+    public Kalaha(SuperPocket firstPocket, int count, Player player) {
+        numbOfStones = 0;
+        count++;
+        this.setOwner(player);
+        if (count == 7) {
+            this.setNeighbour(new Pocket(firstPocket, count, player.getOpponent()));
+        } else if (count == 14) {
+            this.setNeighbour(firstPocket);
+        }
+    }
+
+    protected Player getPlayer() {
+        return owner;
+    }
+
+    protected void takeStones(int passStones) {
+        if (owner.getTurn()) {
+            numbOfStones++;
+            passStones--;
+            if (passStones > 0) {
+                neighbour.takeStones(passStones);
+            } else {
+                return;
+            }
+        } else {
+            neighbour.takeStones(passStones);
+        }
+    }
+
+    protected SuperPocket getStrikePocket() {
+        return goToPocket(getStepsToKalaha(0));
+    }
+
+    protected void receiveStonesFromStrike(int stonesFromStrike) {
+        numbOfStones += stonesFromStrike;
+
+    }
+}
