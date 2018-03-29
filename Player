@@ -1,0 +1,44 @@
+package nl.sogyo.mancala;
+
+public class Player {
+    private Player opponent;
+    protected boolean turn;
+    private boolean winner;
+
+
+    protected Player() {
+        opponent = new Player(this);
+        turn = true;
+    }
+
+    protected Player(Player player) {
+        this.opponent = player;
+        turn = false;
+    }
+
+    protected boolean getTurn() {
+        return turn;
+    }
+
+    protected Player getOpponent() {
+        return opponent;
+    }
+
+    protected void switchOwner() {
+        turn = !turn;
+        opponent.turn = !opponent.turn;
+    }
+    protected boolean getWinner() {
+        return winner;
+    }
+
+    protected void isWinner() {
+        winner = true;
+        opponent.winner = false;
+    }
+
+    protected void tie() {
+        winner = false;
+        opponent.winner = false;
+    }
+}
