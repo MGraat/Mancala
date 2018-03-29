@@ -1,0 +1,74 @@
+package nl.sogyo.mancala;
+
+abstract class SuperPocket {
+
+    protected SuperPocket neighbour;
+    protected Player owner;
+    protected int numbOfStones = 4;
+
+    protected void setOwner(Player owner) {
+        this.owner = owner;
+    }
+
+    protected Player getOwner() {
+        return owner;
+    }
+
+    protected void setNeighbour(SuperPocket neighbour) {
+        this.neighbour = neighbour;
+    }
+
+    protected int getNumbOfStones() {
+        return numbOfStones;
+    }
+
+    protected void setNumbOfStones(int numbOfStones) {
+        this.numbOfStones = numbOfStones;
+    }
+
+    protected Player getPlayer() {
+        return owner;
+    }
+
+    protected abstract void takeStones(int passStones);
+
+    protected SuperPocket findKalaha() {
+        if (neighbour instanceof Kalaha) {
+            return neighbour;
+        } else {
+            return neighbour.findKalaha();
+        }
+    }
+
+    protected int getStepsToKalaha(int stepsToKalaha) {
+        if (neighbour instanceof Kalaha) {
+            stepsToKalaha++;
+            return stepsToKalaha;
+        } else {
+            stepsToKalaha++;
+            return neighbour.getStepsToKalaha(stepsToKalaha);
+        }
+    }
+
+    protected abstract SuperPocket getStrikePocket();
+
+    protected SuperPocket findSuperPocketX(int pocketNumber) {
+        if (pocketNumber > 1) {
+            pocketNumber--;
+            return neighbour.findSuperPocketX(pocketNumber);
+
+        } else {
+            return this;
+        }
+    }
+
+    protected SuperPocket goToPocket(int numbOfSteps) {
+        if (numbOfSteps > 1) {
+            numbOfSteps--;
+            return neighbour.goToPocket(numbOfSteps);
+        }else {
+            return neighbour;
+        }
+    }
+
+}
