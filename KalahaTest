@@ -1,0 +1,121 @@
+package nl.sogyo.mancala;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class KalahaTest {
+
+    @Test
+    public void kalahaHasANeighbourTest() {
+        Pocket pocket = new Pocket();
+        pocket.findKalaha();
+        Assert.assertTrue(pocket.findKalaha().neighbour instanceof Pocket);
+    }
+
+    @Test
+    public void firstKalahaIsDifferentFromTheSecondKalahaTest() {
+        Pocket pocket = new Pocket();
+        SuperPocket kalaha = pocket.findKalaha();
+        SuperPocket kalaha2 = kalaha.findKalaha();
+        Assert.assertNotSame(kalaha, kalaha2);
+    }
+
+    @Test
+    public void the7thPocketIsAKalahaTest() {
+        Pocket pocket = new Pocket();
+        SuperPocket located = pocket.findSuperPocketX(7);
+        Assert.assertTrue(located instanceof Kalaha);
+    }
+
+    @Test
+    public void the14thPocketIsAKalahaTest() {
+        Pocket pocket = new Pocket();
+        SuperPocket located = pocket.findSuperPocketX(14);
+        Assert.assertTrue(located instanceof Kalaha);
+    }
+
+    @Test
+    public void firstPocketIsFirstPocket() {
+        SuperPocket pocket = new Pocket();
+        Assert.assertSame(pocket, pocket.findSuperPocketX(1));
+    }
+
+    @Test
+    public void firstPocketIsNeighbourOf14() {
+        SuperPocket pocket = new Pocket();
+        Assert.assertSame(pocket, pocket.findSuperPocketX(15));
+    }
+
+    @Test
+    public void neighbour2ndKalahaIsfirstPocket() {
+        Pocket pocket = new Pocket();
+        SuperPocket kalaha = pocket.findKalaha();
+        SuperPocket kalaha2 = kalaha.findKalaha();
+        Assert.assertSame(kalaha2.neighbour, pocket);
+    }
+
+    @Test
+    public void eachKalahatHas0StonesAtInitializationTest() {
+        Pocket pocket = new Pocket();
+        SuperPocket kalaha = pocket.findKalaha();
+        Assert.assertEquals(0, kalaha.getNumbOfStones());
+    }
+
+    @Test
+    public void checkNumberOfStonesInKalahaAfterMove() {
+        Pocket pocket = new Pocket();
+        pocket.setNumbOfStones(8);
+        pocket.validMove();
+        Assert.assertFalse(pocket.getPlayer().getTurn());
+        Assert.assertTrue(pocket.getPlayer().getOpponent().getTurn());
+        Assert.assertEquals(pocket.getNumbOfStones(), 0);
+        Assert.assertEquals(pocket.findKalaha().getNumbOfStones(), 1);
+        Assert.assertEquals(pocket.findSuperPocketX(9).getNumbOfStones(), 5);
+        Assert.assertEquals(pocket.findSuperPocketX(10).getNumbOfStones(), 4);
+    }
+
+    @Test
+    public void testGetStrikePocket() {
+        Pocket pocket = new Pocket();
+        Pocket pocket1 = (Pocket) pocket.findSuperPocketX(3);
+        Assert.assertNotNull(pocket1.getStrikePocket());
+        Assert.assertSame(pocket1.getStrikePocket(), pocket.findSuperPocketX(11));
+    }
+
+    @Test
+    public void testTakeStonesOpponent() {
+        Pocket pocket = new Pocket();
+        Kalaha kalaha = (Kalaha) pocket.findSuperPocketX(14);
+        kalaha.takeStones(5);
+        Assert.assertEquals(kalaha.getNumbOfStones(), 0);
+    }
+
+    @Test
+    public void testTakeLastStoneOwnPlayerPlayAgain() {
+        Pocket pocket = new Pocket();
+        Kalaha kalaha = (Kalaha) pocket.findKalaha();
+        kalaha.takeStones(1);
+        Assert.assertEquals(kalaha.getNumbOfStones(), 1);
+        Assert.assertTrue(kalaha.getPlayer().getTurn());
+        Assert.assertFalse(pocket.findSuperPocketX(14).getPlayer().getTurn());
+    }
+
+    @Test
+    public void testEmptyKalahaTakesStonesFromStrike() {
+        Pocket pocket = new Pocket();
+        Kalaha kalaha = (Kalaha) pocket.findKalaha();
+        kalaha.receiveStonesFromStrike(5);
+        Assert.assertEquals(kalaha.getNumbOfStones(), 5);
+    }
+
+    @Test
+    public void testNotEmptyKalahaTakesStonesFromStrike() {
+        Pocket pocket = new Pocket();
+        Kalaha kalaha = (Kalaha) pocket.findKalaha();
+        kalaha.setNumbOfStones(3);
+        kalaha.receiveStonesFromStrike(5);
+        Assert.assertEquals(kalaha.getNumbOfStones(), 8);
+    }
+}
